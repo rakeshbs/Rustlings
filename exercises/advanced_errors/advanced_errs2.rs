@@ -16,8 +16,6 @@
 // 4. Complete the partial implementation of `Display` for
 //    `ParseClimateError`.
 
-// I AM NOT DONE
-
 use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 use std::num::{ParseFloatError, ParseIntError};
@@ -52,6 +50,11 @@ impl From<ParseFloatError> for ParseClimateError {
 
 // TODO: Implement a missing trait so that `main()` below will compile. It
 // is not necessary to implement any methods inside the missing trait.
+impl Error for ParseClimateError {
+    //fn from(e: ParseClimateError) -> Self {
+    //Box::new(Error::new())
+    //}
+}
 
 // The `Display` trait allows for other code to obtain the error formatted
 // as a user-visible string.
@@ -92,12 +95,18 @@ impl FromStr for Climate {
     // cases.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let v: Vec<_> = s.split(',').collect();
+        if s == "" {
+            return Err(ParseClimateError::Empty);
+        }
         let (city, year, temp) = match &v[..] {
             [city, year, temp] => (city.to_string(), year, temp),
             _ => return Err(ParseClimateError::BadLen),
         };
         let year: u32 = year.parse()?;
         let temp: f32 = temp.parse()?;
+        if city == "" {
+            return Err(ParseClimateError::NoCity);
+        }
         Ok(Climate { city, year, temp })
     }
 }
